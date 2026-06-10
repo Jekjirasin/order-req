@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบดึงข้อมูลและพิมพ์ใบรายงาน</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: #f0f0f0;
+            padding: 20px;
+            font-family: sans-serif;
+        }
+
+        .paper {
+            background: #fff;
+            border: 1px solid #000;
+            padding: 20px 20px 35px 20px;
+            width: 100%;
+            margin-bottom: 30px;
+            position: relative;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+            box-sizing: border-box;
+        }
+
+        .doc-ctrl-top {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 10px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .doc-ctrl-bottom {
+            position: absolute;
+            bottom: 12px;
+            right: 20px;
+            font-size: 10px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .title {
+            text-align: center;
+            font-size: 22px;
+            font-weight: bold;
+            margin-top: 5px;
+            margin-bottom: 15px;
+        }
+
+        /* 🛠️ ล็อกให้ทุกตารางใช้ขนาดกว้าง 100% เต็มพื้นที่กระดาษ ไม่โดน Grid บีบ */
+        table {
+            width: 100% !important;
+            table-layout: fixed; /* บังคับสัดส่วนคอลัมน์ให้คงที่ */
+            border-collapse: collapse;
+            margin-bottom: 12px;
+        }
+
+        table, th, td {
+            border: 1px solid #000;
+        }
+
+        th {
+            padding: 4px 2px;
+            text-align: center;
+            vertical-align: middle;
+            font-size: 11px;
+            background-color: #fafafa;
+        }
+
+        td {
+            padding: 4px 2px;
+            text-align: center;
+            vertical-align: middle;
+            font-size: 11px;
+        }
+
+        .main-report-table tbody tr {
+            height: 32px; 
+        }
+
+        .main-report-table tbody td {
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .header-table td {
+            border: none;
+            text-align: left;
+            font-size: 12px;
+            font-weight: bold;
+            padding-bottom: 8px;
+        }
+
+        .blank-row {
+            height: 25px;
+        }
+
+        .control-panel {
+            background: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        /* 🛠️ แก้ไขพื้นที่ตารางพนักงานกะเช้า/กะดึก ให้ขอบซ้ายขวาแนบชิดเท่าตารางบน */
+        .employee-section-row {
+            display: flex;
+            gap: 15px; /* เว้นระยะห่างระหว่างตารางซ้าย-ขวา */
+            width: 100%;
+        }
+        
+        .employee-table-container {
+            flex: 1; /* แบ่งพื้นที่ฝั่งละ 50% เท่ากัน */
+        }
+
+        @page {
+            size: A4 landscape;
+            margin: 0;
+        }
+
+        @media print {
+            body {
+                background: #fff !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                width: 100% !important;
+            }
+            
+            .container-fluid {
+                padding: 0 !important;
+                margin: 0 !important;
+                width: 100% !important;
+                max-width: 100% !important;
+            }
+
+            .control-panel, .btn-print-row {
+                display: none !important;
+            }
+
+            .paper {
+                border: none !important;
+                box-shadow: none !important;
+                padding: 5mm 5mm 10mm 5mm !important; 
+                width: 100% !important;
+                max-width: 100% !important;
+                margin: 0 !important;
+                box-sizing: border-box !important;
+                page-break-after: always;
+                page-break-inside: avoid;
+            }
+
+            .doc-ctrl-top {
+                top: 5mm !important;
+                right: 5mm !important;
+            }
+            
+            .doc-ctrl-bottom {
+                bottom: 4mm !important;
+                right: 5mm !important;
+            }
+
+            table {
+                width: 100% !important;
+            }
+            
+            .text-primary {
+                color: #000 !important; 
+            }
+            
+            /* รักษาช่องว่างระหว่างตารางตอนสั่งพิมพ์ */
+            .employee-section-row {
+                gap: 5mm !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container-fluid">
+        <div class="control-panel d-flex justify-content-between align-items-center">
+            <h5>🖨️ ระบบดึงข้อมูลรายงานเพื่อสั่งพิมพ์</h5>
+            <div>
+                <a href="index.html" class="btn btn-outline-secondary me-2">🏠 กลับหน้าบันทึกข้อมูล</a>
+                <button class="btn btn-primary me-2" onclick="loadData()">🔄 โหลด/อัปเดตข้อมูล</button>
+                <button class="btn btn-dark" onclick="window.print()">🖨️ สั่งพิมพ์ทั้งหมด</button>
+            </div>
+        </div>
+
+        <div id="reportContainer">
+            <div class="text-center p-5">⏳ กำลังโหลดข้อมูลจาก Google Sheets...</div>
+        </div>
+    </div>
+
+    <script>
+        const webAppUrl = "https://script.google.com/macros/s/AKfycbxc-qvigsp_1y1ZCg9C0ApyQDZrVHTiQZGy4jU8suH5ItTIEoblDI87BwKYdLSh5PE15Q/exec";
+
+        window.onload = function() {
+            loadData();
+        };
+
+        function formatDateToThai(dateStr) {
+            if (!dateStr) return "";
+            try {
+                let cleanStr = String(dateStr).trim();
+                let dateObj = new Date(cleanStr);
+                if (!isNaN(dateObj.getTime())) {
+                    let dd = String(dateObj.getDate()).padStart(2, '0');
+                    let mm = String(dateObj.getMonth() + 1).padStart(2, '0');
+                    let yyyy = dateObj.getFullYear();
+                    return `${dd}/${mm}/${yyyy}`;
+                }
+                cleanStr = cleanStr.split(" ")[0].split("T")[0].replace(/[-.]/g, "/");
+                let parts = cleanStr.split("/");
+                if (parts.length === 3) {
+                    if (parts[0].length === 4) {
+                        return `${parts[2].padStart(2, '0')}/${parts[1].padStart(2, '0')}/${parts[0]}`;
+                    }
+                    return `${parts[0].padStart(2, '0')}/${parts[1].padStart(2, '0')}/${parts[2]}`;
+                }
+                return cleanStr;
+            } catch (e) {
+                console.error("Error formatting date:", e);
+                return String(dateStr);
+            }
+        }
+
+        function formatDocNo(docNo) {
+            if (docNo === undefined || docNo === null) return "";
+            let strDoc = String(docNo).trim();
+            if (/^\d+$/.test(strDoc)) {
+                return strDoc.padStart(4, '0');
+            }
+            return strDoc;
+        }
+
+        async function loadData() {
+            const container = document.getElementById("reportContainer");
+            container.innerHTML = `<div class="text-center p-5">⏳ กำลังดึงข้อมูลล่าสุด...</div>`;
+
+            try {
+                const response = await fetch(webAppUrl);
+                const data = await response.json();
+
+                if (data.error) {
+                    container.innerHTML = `<div class="alert alert-danger">เกิดข้อผิดพลาด: ${data.error}</div>`;
+                    return;
+                }
+
+                if (data.length === 0) {
+                    container.innerHTML = `<div class="alert alert-warning text-center">📭 ไม่พบข้อมูลในระบบ</div>`;
+                    return;
+                }
+
+                const groupedData = {};
+                data.forEach(item => {
+                    if (item.docNo) {
+                        const finalDocNo = formatDocNo(item.docNo);
+                        if (!groupedData[finalDocNo]) {
+                            groupedData[finalDocNo] = {
+                                docDate: item.docDate,
+                                machineNo: item.machineNo,
+                                docNo: finalDocNo, 
+                                orderedBy: item.orderedBy,
+                                recordedBy: item.recordedBy,
+                                plans: []
+                            };
+                        }
+                        groupedData[finalDocNo].plans.push(item);
+                    }
+                });
+
+                if (Object.keys(groupedData).length === 0) {
+                    container.innerHTML = `<div class="alert alert-warning text-center">📭 ไม่พบข้อมูลที่ระบุเลขที่เอกสารเพื่อพิมพ์รายงาน</div>`;
+                    return;
+                }
+
+                container.innerHTML = "";
+
+                for (let docNo in groupedData) {
+                    const doc = groupedData[docNo];
+                    const formattedDate = formatDateToThai(doc.docDate);
+                    let tableRows = "";
+                    let totalRowsCount = 10; 
+                    
+                    for (let i = 0; i < totalRowsCount; i++) {
+                        if (doc.plans[i]) {
+                            let plan = doc.plans[i];
+                            tableRows += `
+                            <tr>
+                                <td>${plan.customer || ''}</td>
+                                <td>${plan.productSize || ''}</td>
+                                <td>${plan.materialColor || ''}</td>
+                                <td>${plan.qtyPcs || ''}</td>
+                                <td>${plan.qtyBox || ''}</td>
+                                <td>${plan.lotPreform || ''}</td> 
+                                <td>${plan.lotBag || ''}</td>
+                                <td></td> <td></td> <td></td> 
+                                <td></td> <td></td> <td></td> 
+                                <td>${plan.actualQty || ''}</td> 
+                                <td>${plan.rejectBottle || ''}</td> 
+                                <td>${plan.rejectPreform || ''}</td> 
+                                <td>${plan.rejectPercent || ''}</td> 
+                                <td>${plan.remark || ''}</td>
+                            </tr>`;
+                        } else {
+                            tableRows += `
+                            <tr>
+                                <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                                <td></td><td></td><td></td><td></td><td></td><td></td>
+                                <td></td><td></td><td></td><td></td><td></td>
+                            </tr>`;
+                        }
+                    }
+
+                    // 🛠️ ปรับเปลี่ยนจากคลาส row/col ของ Bootstrap มาเป็น Flexbox แบบ Custom (.employee-section-row)
+                    // และกำหนดสัดส่วนความกว้างคอลัมน์ภายในตารางย่อยให้เท่ากัน 
+                    let htmlPaper = `
+                    <div class="paper">
+                        <div class="doc-ctrl-top">QF-PD-01-01 Rev.04</div>
+
+                        <div class="title">ใบรายงานการสั่งงานผลิต ขวด PET</div>
+                        
+                        <table class="header-table">
+                            <tr>
+                                <td style="width:20%;">วันที่ผลิต: <span class="text-primary">${formattedDate}</span></td>
+                                <td style="width:15%;">เครื่องจักร: <span class="text-primary">${doc.machineNo || ''}</span></td>
+                                <td style="width:20%;">เลขที่เอกสาร: <span class="text-primary">${doc.docNo}</span></td>
+                                <td style="width:22%;">ผู้บันทึก: <span class="text-primary">${doc.recordedBy || ''}</span></td>
+                                <td style="width:23%;">ผู้สั่งงาน: <span class="text-primary">${doc.orderedBy || ''}</span></td>
+                            </tr>
+                        </table>
+
+                        <table class="main-report-table">
+                            <thead>
+                                <tr>
+                                    <th rowspan="2" style="width:12%;">ชื่อลูกค้า/STOCK</th>
+                                    <th rowspan="2" style="width:10%;">ผลิตภัณฑ์/ขนาด</th>
+                                    <th rowspan="2" style="width:8%;">วัตถุดิบ/สี</th>
+                                    <th colspan="2" style="width:10%;">จำนวนที่สั่งผลิต</th>
+                                    <th colspan="2" style="width:10%;">Lot No</th>
+                                    <th colspan="3" style="width:11%;">ระยะเวลาที่วางแผน</th>
+                                    <th colspan="3" style="width:11%;">ระยะเวลาที่ผลิตจริง</th>
+                                    <th rowspan="2" style="width:7%;">จำนวนผลิตจริง</th>
+                                    <th colspan="3" style="width:11%;">สินค้าเสีย</th>
+                                    <th rowspan="2" style="width:10%;">หมายเหตุ</th>
+                                </tr>
+                                <tr>
+                                    <th>ชิ้น</th>
+                                    <th>กล่อง</th>
+                                    <th>พรีฟอร์ม</th>
+                                    <th>ถุง</th>
+                                    <th>เริ่ม</th>
+                                    <th>สิ้นสุด</th>
+                                    <th>ชม.</th>
+                                    <th>เริ่ม</th>
+                                    <th>สิ้นสุด</th>
+                                    <th>ชม.</th>
+                                    <th>ขวด</th>
+                                    <th>พรีฟอร์ม</th>
+                                    <th>%</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${tableRows}
+                            </tbody>
+                        </table>
+
+                        <div class="employee-section-row">
+                            <div class="employee-table-container">
+                                <table style="table-layout: fixed;">
+                                    <tr><th colspan="5" style="padding: 3px;">รายละเอียดพนักงานประจำเครื่อง (กะเช้า)</th></tr>
+                                    <tr>
+                                        <th rowspan="2" style="width:12%;">ลำดับ</th>
+                                        <th rowspan="2" style="width:40%;">ชื่อ-สกุล พนักงาน/ช่าง/คิวซี</th>
+                                        <th colspan="3" style="width:48%;">เวลาทำงาน : ชั่วโมง</th>
+                                    </tr>
+                                    <tr><th style="width:16%;">เวลาเข้า</th><th style="width:16%;">เวลาออก</th><th style="width:16%;">รวมผลิตได้</th></tr>
+                                    <tr class="blank-row"><td>1</td><td></td><td></td><td></td><td></td></tr>
+                                    <tr class="blank-row"><td>2</td><td></td><td></td><td></td><td></td></tr>
+                                    <tr class="blank-row"><td>3</td><td></td><td></td><td></td><td></td></tr>
+                                </table>
+                            </div>
+                            <div class="employee-table-container">
+                                <table style="table-layout: fixed;">
+                                    <tr><th colspan="5" style="padding: 3px;">รายละเอียดพนักงานประจำเครื่อง (กะดึก)</th></tr>
+                                    <tr>
+                                        <th rowspan="2" style="width:12%;">ลำดับ</th>
+                                        <th rowspan="2" style="width:40%;">ชื่อ-สกุล พนักงาน/ช่าง/คิวซี</th>
+                                        <th colspan="3" style="width:48%;">เวลาทำงาน : ชั่วโมง</th>
+                                    </tr>
+                                    <tr><th style="width:16%;">เวลาเข้า</th><th style="width:16%;">เวลาออก</th><th style="width:16%;">รวมผลิตได้</th></tr>
+                                    <tr class="blank-row"><td>1</td><td></td><td></td><td></td><td></td></tr>
+                                    <tr class="blank-row"><td>2</td><td></td><td></td><td></td><td></td></tr>
+                                    <tr class="blank-row"><td>3</td><td></td><td></td><td></td><td></td></tr>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <div class="doc-ctrl-bottom">ประกาศใช้เมื่อวันที่ : 9 มิถุนายน 2569</div>
+
+                        <div class="btn-print-row text-end mt-2">
+                            <button class="btn btn-sm btn-secondary" onclick="window.print()">🖨️ พิมพ์เฉพาะใบนี้</button>
+                        </div>
+                    </div>`;
+                    
+                    container.insertAdjacentHTML("beforeend", htmlPaper);
+                }
+
+            } catch (error) {
+                container.innerHTML = `<div class="alert alert-danger">ไม่สามารถเชื่อมต่อระบบได้: ${error}</div>`;
+                console.error(error);
+            }
+        }
+    </script>
+</body>
+
+</html>
