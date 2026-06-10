@@ -50,10 +50,9 @@
             margin-bottom: 15px;
         }
 
-        /* 🛠️ ล็อกให้ทุกตารางใช้ขนาดกว้าง 100% เต็มพื้นที่กระดาษ ไม่โดน Grid บีบ */
         table {
             width: 100% !important;
-            table-layout: fixed; /* บังคับสัดส่วนคอลัมน์ให้คงที่ */
+            table-layout: fixed;
             border-collapse: collapse;
             margin-bottom: 12px;
         }
@@ -106,15 +105,14 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
-        /* 🛠️ แก้ไขพื้นที่ตารางพนักงานกะเช้า/กะดึก ให้ขอบซ้ายขวาแนบชิดเท่าตารางบน */
         .employee-section-row {
             display: flex;
-            gap: 15px; /* เว้นระยะห่างระหว่างตารางซ้าย-ขวา */
+            gap: 15px;
             width: 100%;
         }
         
         .employee-table-container {
-            flex: 1; /* แบ่งพื้นที่ฝั่งละ 50% เท่ากัน */
+            flex: 1;
         }
 
         @page {
@@ -171,7 +169,6 @@
                 color: #000 !important; 
             }
             
-            /* รักษาช่องว่างระหว่างตารางตอนสั่งพิมพ์ */
             .employee-section-row {
                 gap: 5mm !important;
             }
@@ -182,12 +179,19 @@
 <body>
 
     <div class="container-fluid">
-        <div class="control-panel d-flex justify-content-between align-items-center">
-            <h5>🖨️ ระบบดึงข้อมูลรายงานเพื่อสั่งพิมพ์</h5>
+        <div class="control-panel d-flex flex-wrap justify-content-between align-items-center gap-3">
+            <div class="d-flex align-items-center gap-2">
+                <h5 class="mb-0">🖨️ ระบบพิมพ์ใบรายงาน</h5>
+                <div class="d-flex align-items-center ms-3 bg-light p-2 rounded border">
+                    <label for="filterDate" class="form-label mb-0 me-2 fw-bold text-secondary" style="font-size: 14px; min-width: 90px;">📅 เลือกเฉพาะวัน:</label>
+                    <input type="date" id="filterDate" class="form-control form-control-sm" onchange="loadData()" style="width: 160px;">
+                    <button class="btn btn-sm btn-link text-decoration-none p-0 ms-2" onclick="clearDateFilter()">ล้างค่า</button>
+                </div>
+            </div>
             <div>
                 <a href="index.html" class="btn btn-outline-secondary me-2">🏠 กลับหน้าบันทึกข้อมูล</a>
-                <button class="btn btn-primary me-2" onclick="loadData()">🔄 โหลด/อัปเดตข้อมูล</button>
-                <button class="btn btn-dark" onclick="window.print()">🖨️ สั่งพิมพ์ทั้งหมด</button>
+                <button class="btn btn-primary me-2" onclick="loadData()">🔄 โหล่งข้อมูลใหม่</button>
+                <button class="btn btn-dark" onclick="window.print()">🖨️ สั่งพิมพ์ทั้งหมดที่แสดง</button>
             </div>
         </div>
 
@@ -197,11 +201,38 @@
     </div>
 
     <script>
-        const webAppUrl = "https://script.google.com/macros/s/AKfycbxc-qvigsp_1y1ZCg9C0ApyQDZrVHTiQZGy4jU8suH5ItTIEoblDI87BwKYdLSh5PE15Q/exec";
+        const webAppUrl = "https://script.google.com/macros/s/AKfycbxsp3iGGDR2AzSGmNP3oaoAsjyzKI-9FyMwYCt287cV7ksDl_Die3MjJUSCUVZfXM2WFw/exec";
 
         window.onload = function() {
+            // ตั้งค่าวันที่เริ่มต้นในปฏิทินให้เป็นวันปัจจุบัน (เพื่อความสะดวกในการใช้งาน)
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('filterDate').value = today;
+            
             loadData();
         };
+
+        // ฟังก์ชันล้างตัวเลือกวันที่ เพื่อให้แสดงข้อมูลทั้งหมด
+        function clearDateFilter() {
+            document.getElementById('filterDate').value = "";
+            loadData();
+        }
+
+        // แปลงวัตถุวันที่ให้อยู่ในฟอร์แมต YYYY-MM-DD เพื่อเอาไว้ใช้เปรียบเทียบความถูกต้องของตัวกรอง
+        function getStandardDateStr(dateStr) {
+            if (!dateStr) return "";
+            try {
+                let dateObj = new Date(String(dateStr).trim());
+                if (!isNaN(dateObj.getTime())) {
+                    let yyyy = dateObj.getFullYear();
+                    let mm = String(dateObj.getMonth() + 1).padStart(2, '0');
+                    let dd = String(dateObj.getDate()).padStart(2, '0');
+                    return `${yyyy}-${mm}-${dd}`;
+                }
+                return "";
+            } catch (e) {
+                return "";
+            }
+        }
 
         function formatDateToThai(dateStr) {
             if (!dateStr) return "";
@@ -240,6 +271,8 @@
 
         async function loadData() {
             const container = document.getElementById("reportContainer");
+            const selectedDate = document.getElementById("filterDate").value; // ดึงค่าจากตัวเลือกวันที่
+            
             container.innerHTML = `<div class="text-center p-5">⏳ กำลังดึงข้อมูลล่าสุด...</div>`;
 
             try {
@@ -259,6 +292,14 @@
                 const groupedData = {};
                 data.forEach(item => {
                     if (item.docNo) {
+                        // 🛠️ ตรวจสอบการกรองวันที่: ถ้ามีการเลือกวัน ให้ข้ามข้อมูลที่ไม่ตรงกับที่เลือก
+                        if (selectedDate) {
+                            const itemDateStr = getStandardDateStr(item.docDate);
+                            if (itemDateStr !== selectedDate) {
+                                return; // ข้ามแถวนี้ไปเลยถ้าไม่ตรงกับวันที่เลือก
+                            }
+                        }
+
                         const finalDocNo = formatDocNo(item.docNo);
                         if (!groupedData[finalDocNo]) {
                             groupedData[finalDocNo] = {
@@ -275,7 +316,7 @@
                 });
 
                 if (Object.keys(groupedData).length === 0) {
-                    container.innerHTML = `<div class="alert alert-warning text-center">📭 ไม่พบข้อมูลที่ระบุเลขที่เอกสารเพื่อพิมพ์รายงาน</div>`;
+                    container.innerHTML = `<div class="alert alert-warning text-center">📭 ไม่พบข้อมูลรายงานในวันที่เลือก</div>`;
                     return;
                 }
 
@@ -317,8 +358,6 @@
                         }
                     }
 
-                    // 🛠️ ปรับเปลี่ยนจากคลาส row/col ของ Bootstrap มาเป็น Flexbox แบบ Custom (.employee-section-row)
-                    // และกำหนดสัดส่วนความกว้างคอลัมน์ภายในตารางย่อยให้เท่ากัน 
                     let htmlPaper = `
                     <div class="paper">
                         <div class="doc-ctrl-top">QF-PD-01-01 Rev.04</div>
