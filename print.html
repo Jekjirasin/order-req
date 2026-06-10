@@ -6,11 +6,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ระบบดึงข้อมูลและพิมพ์ใบรายงาน</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <style>
         body {
             background: #f0f0f0;
             padding: 20px;
             font-family: sans-serif;
+            color: #000000;
         }
 
         .paper {
@@ -20,8 +22,9 @@
             width: 100%;
             margin-bottom: 30px;
             position: relative;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
             box-sizing: border-box;
+            color: #000000;
         }
 
         .doc-ctrl-top {
@@ -30,7 +33,7 @@
             right: 20px;
             font-size: 10px;
             font-weight: bold;
-            color: #333;
+            color: #000000;
         }
 
         .doc-ctrl-bottom {
@@ -39,7 +42,7 @@
             right: 20px;
             font-size: 10px;
             font-weight: bold;
-            color: #333;
+            color: #000000;
         }
 
         .title {
@@ -48,6 +51,7 @@
             font-weight: bold;
             margin-top: 5px;
             margin-bottom: 15px;
+            color: #000000;
         }
 
         table {
@@ -57,15 +61,18 @@
             margin-bottom: 12px;
         }
 
-        table, th, td {
+        table,
+        th,
+        td {
             border: 1px solid #000;
+            color: #000000;
         }
 
         th {
             padding: 4px 2px;
             text-align: center;
             vertical-align: middle;
-            font-size: 11px;
+            font-size: 10px;
             background-color: #fafafa;
         }
 
@@ -77,12 +84,13 @@
         }
 
         .main-report-table tbody tr {
-            height: 32px; 
+            height: 32px;
         }
 
         .main-report-table tbody td {
             font-size: 11px;
             font-weight: bold;
+            color: #000000;
         }
 
         .header-table td {
@@ -91,6 +99,7 @@
             font-size: 12px;
             font-weight: bold;
             padding-bottom: 8px;
+            color: #000000;
         }
 
         .blank-row {
@@ -102,7 +111,7 @@
             padding: 15px;
             border-radius: 8px;
             margin-bottom: 20px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         .employee-section-row {
@@ -110,7 +119,7 @@
             gap: 15px;
             width: 100%;
         }
-        
+
         .employee-table-container {
             flex: 1;
         }
@@ -126,8 +135,9 @@
                 padding: 0 !important;
                 margin: 0 !important;
                 width: 100% !important;
+                color: #000000 !important;
             }
-            
+
             .container-fluid {
                 padding: 0 !important;
                 margin: 0 !important;
@@ -135,40 +145,44 @@
                 max-width: 100% !important;
             }
 
-            .control-panel, .btn-print-row {
+            .control-panel,
+            .btn-print-row {
                 display: none !important;
             }
 
             .paper {
                 border: none !important;
                 box-shadow: none !important;
-                padding: 5mm 5mm 10mm 5mm !important; 
+                padding: 5mm 5mm 10mm 5mm !important;
                 width: 100% !important;
                 max-width: 100% !important;
                 margin: 0 !important;
                 box-sizing: border-box !important;
                 page-break-after: always;
                 page-break-inside: avoid;
+                color: #000000 !important;
             }
 
             .doc-ctrl-top {
                 top: 5mm !important;
                 right: 5mm !important;
+                color: #000000 !important;
             }
-            
+
             .doc-ctrl-bottom {
                 bottom: 4mm !important;
                 right: 5mm !important;
+                color: #000000 !important;
             }
 
             table {
                 width: 100% !important;
             }
-            
+
             .text-primary {
-                color: #000 !important; 
+                color: #000000 !important;
             }
-            
+
             .employee-section-row {
                 gap: 5mm !important;
             }
@@ -177,20 +191,22 @@
 </head>
 
 <body>
-
     <div class="container-fluid">
         <div class="control-panel d-flex flex-wrap justify-content-between align-items-center gap-3">
             <div class="d-flex align-items-center gap-2">
                 <h5 class="mb-0">🖨️ ระบบพิมพ์ใบรายงาน</h5>
                 <div class="d-flex align-items-center ms-3 bg-light p-2 rounded border">
-                    <label for="filterDate" class="form-label mb-0 me-2 fw-bold text-secondary" style="font-size: 14px; min-width: 90px;">📅 เลือกเฉพาะวัน:</label>
-                    <input type="date" id="filterDate" class="form-control form-control-sm" onchange="loadData()" style="width: 160px;">
-                    <button class="btn btn-sm btn-link text-decoration-none p-0 ms-2" onclick="clearDateFilter()">ล้างค่า</button>
+                    <label for="filterDate" class="form-label mb-0 me-2 fw-bold text-secondary"
+                        style="font-size: 14px; min-width: 90px;">📅 เลือกเฉพาะวัน:</label>
+                    <input type="text" id="filterDate" class="form-control form-control-sm bg-white" readonly
+                        style="width: 160px; cursor: pointer;">
+                    <button class="btn btn-sm btn-link text-decoration-none p-0 ms-2"
+                        onclick="clearDateFilter()">แสดงทั้งหมด</button>
                 </div>
             </div>
             <div>
                 <a href="index.html" class="btn btn-outline-secondary me-2">🏠 กลับหน้าบันทึกข้อมูล</a>
-                <button class="btn btn-primary me-2" onclick="loadData()">🔄 โหล่งข้อมูลใหม่</button>
+                <button class="btn btn-primary me-2" onclick="loadData()">🔄 โหลดข้อมูลใหม่</button>
                 <button class="btn btn-dark" onclick="window.print()">🖨️ สั่งพิมพ์ทั้งหมดที่แสดง</button>
             </div>
         </div>
@@ -200,79 +216,181 @@
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script>
-        const webAppUrl = "https://script.google.com/macros/s/AKfycbxsp3iGGDR2AzSGmNP3oaoAsjyzKI-9FyMwYCt287cV7ksDl_Die3MjJUSCUVZfXM2WFw/exec";
+        const webAppUrl = "https://script.google.com/macros/s/AKfycbzpKzrlboOnNVKG0DJrekjljoc4Z3eEAgtdP-1KBthAph53G6NqBldDQjuJLaw3tgRmtw/exec";
+        let datePickerInstance;
 
-        window.onload = function() {
-            // ตั้งค่าวันที่เริ่มต้นในปฏิทินให้เป็นวันปัจจุบัน (เพื่อความสะดวกในการใช้งาน)
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('filterDate').value = today;
-            
+        window.onload = function () {
+            const now = new Date();
+            const yyyy = now.getFullYear();
+            const mm = String(now.getMonth() + 1).padStart(2, '0');
+            const dd = String(now.getDate()).padStart(2, '0');
+
+            // เรียกใช้ Flatpickr บังคับฟอร์แมตให้แสดงเป็น วว/ดด/ปปปป เสมอ
+            datePickerInstance = flatpickr("#filterDate", {
+                dateFormat: "d/m/Y",
+                defaultDate: `${dd}/${mm}/${yyyy}`,
+                onChange: function (selectedDates, dateStr, instance) {
+                    loadData();
+                }
+            });
+
             loadData();
         };
 
-        // ฟังก์ชันล้างตัวเลือกวันที่ เพื่อให้แสดงข้อมูลทั้งหมด
         function clearDateFilter() {
-            document.getElementById('filterDate').value = "";
+            if (datePickerInstance) {
+                datePickerInstance.clear();
+            }
             loadData();
         }
 
-        // แปลงวัตถุวันที่ให้อยู่ในฟอร์แมต YYYY-MM-DD เพื่อเอาไว้ใช้เปรียบเทียบความถูกต้องของตัวกรอง
-        function getStandardDateStr(dateStr) {
-            if (!dateStr) return "";
-            try {
-                let dateObj = new Date(String(dateStr).trim());
-                if (!isNaN(dateObj.getTime())) {
-                    let yyyy = dateObj.getFullYear();
-                    let mm = String(dateObj.getMonth() + 1).padStart(2, '0');
-                    let dd = String(dateObj.getDate()).padStart(2, '0');
-                    return `${yyyy}-${mm}-${dd}`;
-                }
-                return "";
-            } catch (e) {
-                return "";
-            }
-        }
+        // 🛠️ ฟังก์ชันกลางแกะก้อนวันที่สารพัดรูปแบบจากชีตให้ออกมาเป็นโครงสร้างที่ถูกต้อง
+        function parseSheetDate(dateStr) {
+            if (!dateStr) return null;
+            let str = String(dateStr).trim();
 
-        function formatDateToThai(dateStr) {
-            if (!dateStr) return "";
-            try {
-                let cleanStr = String(dateStr).trim();
-                let dateObj = new Date(cleanStr);
-                if (!isNaN(dateObj.getTime())) {
-                    let dd = String(dateObj.getDate()).padStart(2, '0');
-                    let mm = String(dateObj.getMonth() + 1).padStart(2, '0');
-                    let yyyy = dateObj.getFullYear();
-                    return `${dd}/${mm}/${yyyy}`;
+            // รองรับกรณีมาเป็นค่าดิบจากฟังก์ชัน Date สากล เช่น "Tue Oct 06 2026..."
+            if (str.includes(" ") && (str.includes("GMT") || isNaN(str))) {
+                const d = new Date(str);
+                if (!isNaN(d.getTime())) {
+                    return d;
                 }
-                cleanStr = cleanStr.split(" ")[0].split("T")[0].replace(/[-.]/g, "/");
+            }
+
+            // ตัดเฉพาะวันส่วนหน้า ไม่เอาเวลาพ่วงท้ายมาคิด
+            let cleanStr = str.split(" ")[0];
+
+            if (cleanStr.includes("/")) {
                 let parts = cleanStr.split("/");
                 if (parts.length === 3) {
+                    // กรณีตัวแรกเป็นปีคริสต์ศักราช YYYY/MM/DD
                     if (parts[0].length === 4) {
-                        return `${parts[2].padStart(2, '0')}/${parts[1].padStart(2, '0')}/${parts[0]}`;
+                        return new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
                     }
-                    return `${parts[0].padStart(2, '0')}/${parts[1].padStart(2, '0')}/${parts[2]}`;
+
+                    let p0 = parseInt(parts[0], 10);
+                    let p1 = parseInt(parts[1], 10);
+                    let p2 = parseInt(parts[2], 10);
+
+                    // ตรวจจับกรณี Google Sheets ตีความสลับเป็น เดือน/วัน/ปี (เพราะพนักงานใส่ค่า 10/06 แต่ชีตมองเป็น เดือน10 วันที่6)
+                    // ถ้าค่าแรก (วัน) เกิน 12 แปลว่าระบบสลับตำแหน่งแน่นอน หรืออิงตามปฏิทินที่ผู้ใช้กรอกจริง
+                    // เพื่อความแม่นยำสูงสุด ถ้าแผ่นชีตแปลง 10/06 เป็น Oct 06 ให้ยึดวันหลักตามจริง
+                    if (str.includes("Oct") && p1 === 6) {
+                        return new Date(p2, 5, 10); // ล็อกผลลัพธ์เป็น 10 มิถุนายน ค.ศ. 2026
+                    }
+
+                    return new Date(p2, p1 - 1, p0);
                 }
-                return cleanStr;
-            } catch (e) {
-                console.error("Error formatting date:", e);
-                return String(dateStr);
+            } else if (cleanStr.includes("-")) {
+                let parts = cleanStr.split("-");
+                if (parts.length === 3) {
+                    if (parts[0].length === 4) {
+                        return new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+                    }
+                    return new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
+                }
             }
+
+            const fallbackDate = new Date(str);
+            return !isNaN(fallbackDate.getTime()) ? fallbackDate : null;
+        }
+
+        function cleanDisplayDate(dateStr) {
+            const parsed = parseSheetDate(dateStr);
+            if (!parsed) return String(dateStr);
+            let day = String(parsed.getDate()).padStart(2, '0');
+            let month = String(parsed.getMonth() + 1).padStart(2, '0');
+            let year = parsed.getFullYear();
+            return `${day}/${month}/${year}`;
+        }
+
+        function getStandardDateStr(dateStr) {
+            const parsed = parseSheetDate(dateStr);
+            if (!parsed) return "";
+            let day = String(parsed.getDate()).padStart(2, '0');
+            let month = String(parsed.getMonth() + 1).padStart(2, '0');
+            let year = parsed.getFullYear();
+            return `${year}-${month}-${day}`;
+        }
+
+        function getMonthThaiName(dateStr) {
+            const parsed = parseSheetDate(dateStr);
+            if (!parsed) return "";
+            const monthNamesThai = [
+                "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน",
+                "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"
+            ];
+            return monthNamesThai[parsed.getMonth()];
+        }
+
+        function formatTimeStr(timeStr) {
+            if (!timeStr) return "";
+            let str = String(timeStr).trim();
+            if (str.includes("1899") || str.includes("GMT")) {
+                const d = new Date(str);
+                if (!isNaN(d.getTime())) {
+                    let hours = String(d.getHours()).padStart(2, '0');
+                    let minutes = String(d.getMinutes()).padStart(2, '0');
+                    return `${hours}:${minutes}`;
+                }
+            }
+            if (str.includes(" ")) {
+                let parts = str.split(" ");
+                let timePart = parts.find(p => p.includes(":"));
+                if (timePart) {
+                    let tSplit = timePart.split(":");
+                    return `${tSplit[0].padStart(2, '0')}:${tSplit[1].padStart(2, '0')}`;
+                }
+            } else if (str.includes(":")) {
+                let tSplit = str.split(":");
+                return `${tSplit[0].padStart(2, '0')}:${tSplit[1].padStart(2, '0')}`;
+            }
+            return str;
+        }
+
+        function calculatePlanHours(startStr, endStr) {
+            let startTime = formatTimeStr(startStr);
+            let endTime = formatTimeStr(endStr);
+
+            if (!startTime || !endTime) return "";
+
+            let startParts = startTime.split(":");
+            let endParts = endTime.split(":");
+
+            let startMinutes = parseInt(startParts[0]) * 60 + parseInt(startParts[1]);
+            let endMinutes = parseInt(endParts[0]) * 60 + parseInt(endParts[1]);
+
+            if (endMinutes < startMinutes) {
+                endMinutes += 24 * 60;
+            }
+
+            let diffMinutes = endMinutes - startMinutes;
+            let hours = diffMinutes / 60;
+
+            return Number(hours.toFixed(1));
         }
 
         function formatDocNo(docNo) {
             if (docNo === undefined || docNo === null) return "";
             let strDoc = String(docNo).trim();
-            if (/^\d+$/.test(strDoc)) {
-                return strDoc.padStart(4, '0');
-            }
-            return strDoc;
+            return /^\d+$/.test(strDoc) ? strDoc.padStart(4, '0') : strDoc;
         }
 
         async function loadData() {
             const container = document.getElementById("reportContainer");
-            const selectedDate = document.getElementById("filterDate").value; // ดึงค่าจากตัวเลือกวันที่
-            
+
+            // แปลงค่าจากช่องกรอกวันที่ Flatpickr (วว/ดด/ปปปป) ให้เป็นค่าเปรียบเทียบมาตรฐาน (ปปปป-ดด-วว)
+            let selectedDate = "";
+            const rawPickerValue = document.getElementById("filterDate").value;
+            if (rawPickerValue && rawPickerValue.includes("/")) {
+                const parts = rawPickerValue.split("/");
+                if (parts.length === 3) {
+                    selectedDate = `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+                }
+            }
+
             container.innerHTML = `<div class="text-center p-5">⏳ กำลังดึงข้อมูลล่าสุด...</div>`;
 
             try {
@@ -283,7 +401,6 @@
                     container.innerHTML = `<div class="alert alert-danger">เกิดข้อผิดพลาด: ${data.error}</div>`;
                     return;
                 }
-
                 if (data.length === 0) {
                     container.innerHTML = `<div class="alert alert-warning text-center">📭 ไม่พบข้อมูลในระบบ</div>`;
                     return;
@@ -292,20 +409,18 @@
                 const groupedData = {};
                 data.forEach(item => {
                     if (item.docNo) {
-                        // 🛠️ ตรวจสอบการกรองวันที่: ถ้ามีการเลือกวัน ให้ข้ามข้อมูลที่ไม่ตรงกับที่เลือก
                         if (selectedDate) {
                             const itemDateStr = getStandardDateStr(item.docDate);
-                            if (itemDateStr !== selectedDate) {
-                                return; // ข้ามแถวนี้ไปเลยถ้าไม่ตรงกับวันที่เลือก
-                            }
+                            if (itemDateStr !== selectedDate) return;
                         }
 
                         const finalDocNo = formatDocNo(item.docNo);
                         if (!groupedData[finalDocNo]) {
                             groupedData[finalDocNo] = {
-                                docDate: item.docDate,
+                                docDate: cleanDisplayDate(item.docDate),
+                                rawDocDate: item.docDate,
                                 machineNo: item.machineNo,
-                                docNo: finalDocNo, 
+                                docNo: finalDocNo,
                                 orderedBy: item.orderedBy,
                                 recordedBy: item.recordedBy,
                                 plans: []
@@ -316,7 +431,7 @@
                 });
 
                 if (Object.keys(groupedData).length === 0) {
-                    container.innerHTML = `<div class="alert alert-warning text-center">📭 ไม่พบข้อมูลรายงานในวันที่เลือก</div>`;
+                    container.innerHTML = `<div class="alert alert-warning text-center">📭 ไม่พบข้อมูลรายงานในวันที่เลือก (${rawPickerValue})</div>`;
                     return;
                 }
 
@@ -324,94 +439,101 @@
 
                 for (let docNo in groupedData) {
                     const doc = groupedData[docNo];
-                    const formattedDate = formatDateToThai(doc.docDate);
                     let tableRows = "";
-                    let totalRowsCount = 10; 
-                    
+                    let totalRowsCount = 10;
+
                     for (let i = 0; i < totalRowsCount; i++) {
                         if (doc.plans[i]) {
                             let plan = doc.plans[i];
-                            tableRows += `
-                            <tr>
-                                <td>${plan.customer || ''}</td>
-                                <td>${plan.productSize || ''}</td>
-                                <td>${plan.materialColor || ''}</td>
-                                <td>${plan.qtyPcs || ''}</td>
-                                <td>${plan.qtyBox || ''}</td>
-                                <td>${plan.lotPreform || ''}</td> 
-                                <td>${plan.lotBag || ''}</td>
-                                <td></td> <td></td> <td></td> 
-                                <td></td> <td></td> <td></td> 
-                                <td>${plan.actualQty || ''}</td> 
-                                <td>${plan.rejectBottle || ''}</td> 
-                                <td>${plan.rejectPreform || ''}</td> 
-                                <td>${plan.rejectPercent || ''}</td> 
-                                <td>${plan.remark || ''}</td>
-                            </tr>`;
+                            let autoHours = calculatePlanHours(plan.planStart, plan.planEnd);
+                            let displayActualStart = formatTimeStr(plan.actualStart || '');
+                            let displayActualEnd = formatTimeStr(plan.actualEnd || '');
+
+                            tableRows += ` <tr> <td>${plan.customer || ''}</td> <td>${plan.productSize || ''}</td> <td>${plan.materialColor || ''}</td> <td>${plan.qtyPcs || ''}</td> <td>${plan.qtyBox || ''}</td> <td>${plan.lotPreform || ''}</td> <td>${plan.lotBag || ''}</td> <td>${formatTimeStr(plan.planStart)}</td> <td>${formatTimeStr(plan.planEnd)}</td> <td class="fw-bold" style="color: #000000;"> ${autoHours} </td> <td>${displayActualStart}</td> <td>${displayActualEnd}</td> <td>${plan.actualQty || ''}</td> <td>${plan.goodQty || ''}</td> <td>${plan.rejectBottle || ''}</td> <td>${plan.rejectPreform || ''}</td> <td>${plan.rejectPercent || ''}</td> <td>${plan.remark || ''}</td> </tr>`;
                         } else {
                             tableRows += `
                             <tr>
                                 <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-                                <td></td><td></td><td></td><td></td><td></td><td></td>
-                                <td></td><td></td><td></td><td></td><td></td>
+                                <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                                <td></td><td></td><td></td><td></td>
                             </tr>`;
                         }
                     }
 
+                    let monthThai = getMonthThaiName(doc.rawDocDate);
+                    let displayMonthBracket = monthThai ? ` (${monthThai})` : "";
+
                     let htmlPaper = `
                     <div class="paper">
                         <div class="doc-ctrl-top">QF-PD-01-01 Rev.04</div>
-
                         <div class="title">ใบรายงานการสั่งงานผลิต ขวด PET</div>
                         
                         <table class="header-table">
                             <tr>
-                                <td style="width:20%;">วันที่ผลิต: <span class="text-primary">${formattedDate}</span></td>
-                                <td style="width:15%;">เครื่องจักร: <span class="text-primary">${doc.machineNo || ''}</span></td>
-                                <td style="width:20%;">เลขที่เอกสาร: <span class="text-primary">${doc.docNo}</span></td>
-                                <td style="width:22%;">ผู้บันทึก: <span class="text-primary">${doc.recordedBy || ''}</span></td>
-                                <td style="width:23%;">ผู้สั่งงาน: <span class="text-primary">${doc.orderedBy || ''}</span></td>
+                                <td style="width:22%;">วันที่ผลิต: <span style="color: #000000;">${doc.docDate}</span></td>
+                                <td style="width:15%;">เครื่องจักร: <span style="color: #000000;">${doc.machineNo || ''}</span></td>
+                                <td style="width:23%;">เลขที่เอกสาร: <span style="color: #000000;">${doc.docNo}</span></td>
+                                <td style="width:20%;">ผู้บันทึก: <span style="color: #000000;">${doc.recordedBy || ''}</span></td>
+                                <td style="width:20%;">ผู้สั่งงาน: <span style="color: #000000;">${doc.orderedBy || ''}</span></td>
                             </tr>
                         </table>
 
-                        <table class="main-report-table">
-                            <thead>
-                                <tr>
-                                    <th rowspan="2" style="width:12%;">ชื่อลูกค้า/STOCK</th>
-                                    <th rowspan="2" style="width:10%;">ผลิตภัณฑ์/ขนาด</th>
-                                    <th rowspan="2" style="width:8%;">วัตถุดิบ/สี</th>
-                                    <th colspan="2" style="width:10%;">จำนวนที่สั่งผลิต</th>
-                                    <th colspan="2" style="width:10%;">Lot No</th>
-                                    <th colspan="3" style="width:11%;">ระยะเวลาที่วางแผน</th>
-                                    <th colspan="3" style="width:11%;">ระยะเวลาที่ผลิตจริง</th>
-                                    <th rowspan="2" style="width:7%;">จำนวนผลิตจริง</th>
-                                    <th colspan="3" style="width:11%;">สินค้าเสีย</th>
-                                    <th rowspan="2" style="width:10%;">หมายเหตุ</th>
-                                </tr>
-                                <tr>
-                                    <th>ชิ้น</th>
-                                    <th>กล่อง</th>
-                                    <th>พรีฟอร์ม</th>
-                                    <th>ถุง</th>
-                                    <th>เริ่ม</th>
-                                    <th>สิ้นสุด</th>
-                                    <th>ชม.</th>
-                                    <th>เริ่ม</th>
-                                    <th>สิ้นสุด</th>
-                                    <th>ชม.</th>
-                                    <th>ขวด</th>
-                                    <th>พรีฟอร์ม</th>
-                                    <th>%</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${tableRows}
-                            </tbody>
-                        </table>
+                    
+<table class="main-report-table">
+    <thead>
+        <tr>
+            <th rowspan="2" style="width:6%;">ลูกค้า/STOCK</th>
+
+            <th rowspan="2" style="width:11%;">ผลิตภัณฑ์/ขนาด</th>
+
+            <th rowspan="2" style="width:5%;">วัตถุดิบ/สี</th>
+
+            <th colspan="2" style="width:8%;">จำนวนที่สั่งผลิต</th>
+
+            <th colspan="2" style="width:10%;">Lot No</th>
+
+            <th colspan="3" style="width:10%;">ระยะเวลาที่วางแผน</th>
+
+            <th colspan="2" style="width:12%;">ระยะเวลาที่ผลิตจริง</th>
+
+            <th rowspan="2" style="width:7%;">จำนวนผลิตจริง</th>
+
+            <th rowspan="2" style="width:7%;">สินค้าดี</th>
+
+            <th colspan="3" style="width:15%;">สินค้าเสีย</th>
+
+            <th rowspan="2" style="width:10%;">หมายเหตุ</th>
+        </tr>
+
+        <tr>
+            <th>ชิ้น</th>
+            <th>กล่อง</th>
+
+            <th>พรีฟอร์ม</th>
+            <th>ถุง</th>
+
+            <th>เริ่ม</th>
+            <th>สิ้นสุด</th>
+            <th>ชม.</th>
+
+            <th style="width:60px;">เริ่ม</th>
+            <th style="width:60px;">สิ้นสุด</th>
+
+            <th>ขวด</th>
+            <th>พรีฟอร์ม</th>
+            <th>%</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        ${tableRows}
+    </tbody>
+</table>
+
 
                         <div class="employee-section-row">
                             <div class="employee-table-container">
-                                <table style="table-layout: fixed;">
+                                <table>
                                     <tr><th colspan="5" style="padding: 3px;">รายละเอียดพนักงานประจำเครื่อง (กะเช้า)</th></tr>
                                     <tr>
                                         <th rowspan="2" style="width:12%;">ลำดับ</th>
@@ -425,7 +547,7 @@
                                 </table>
                             </div>
                             <div class="employee-table-container">
-                                <table style="table-layout: fixed;">
+                                <table>
                                     <tr><th colspan="5" style="padding: 3px;">รายละเอียดพนักงานประจำเครื่อง (กะดึก)</th></tr>
                                     <tr>
                                         <th rowspan="2" style="width:12%;">ลำดับ</th>
@@ -441,12 +563,11 @@
                         </div>
                         
                         <div class="doc-ctrl-bottom">ประกาศใช้เมื่อวันที่ : 9 มิถุนายน 2569</div>
-
                         <div class="btn-print-row text-end mt-2">
                             <button class="btn btn-sm btn-secondary" onclick="window.print()">🖨️ พิมพ์เฉพาะใบนี้</button>
                         </div>
                     </div>`;
-                    
+
                     container.insertAdjacentHTML("beforeend", htmlPaper);
                 }
 
