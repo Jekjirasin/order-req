@@ -186,6 +186,40 @@
             .employee-section-row {
                 gap: 5mm !important;
             }
+
+            /* ปรับปรุงการแสดงผลตารางพนักงาน */
+            .employee-section-row {
+                display: flex;
+                flex-wrap: wrap;
+                /* ปรับให้ลงบรรทัดใหม่ได้หากพื้นที่ไม่พอ */
+                gap: 15px;
+                width: 100%;
+                margin-top: 15px;
+            }
+
+            .employee-table-container {
+                flex: 1;
+                min-width: 400px;
+                /* ให้กะละ 50% ของหน้ากระดาษ */
+            }
+
+            /* ปรับสีและขนาดตัวอักษรในตารางพนักงาน */
+            .employee-table-container table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+
+            .employee-table-container th {
+                background-color: #f8f9fa;
+                font-size: 11px;
+                padding: 5px;
+            }
+
+            .employee-table-container td {
+                height: 25px;
+                /* ความสูงของแถวที่เหมาะสมสำหรับการเขียนด้วยมือ */
+                border: 1px solid #000;
+            }
         }
     </style>
 </head>
@@ -218,7 +252,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script>
-        const webAppUrl = "https://script.google.com/macros/s/AKfycbzpKzrlboOnNVKG0DJrekjljoc4Z3eEAgtdP-1KBthAph53G6NqBldDQjuJLaw3tgRmtw/exec";
+        const webAppUrl = "https://script.google.com/macros/s/AKfycbzh0s98xmEXJbqxcmiqYP534xs2iGwhIJeKzuGJeeAr0Qi6LeI6rvaRDqBXIe3B2qag_Q/exec";
         let datePickerInstance;
 
         window.onload = function () {
@@ -531,36 +565,44 @@
 </table>
 
 
-                        <div class="employee-section-row">
-                            <div class="employee-table-container">
-                                <table>
-                                    <tr><th colspan="5" style="padding: 3px;">รายละเอียดพนักงานประจำเครื่อง (กะเช้า)</th></tr>
-                                    <tr>
-                                        <th rowspan="2" style="width:12%;">ลำดับ</th>
-                                        <th rowspan="2" style="width:40%;">ชื่อ-สกุล พนักงาน/ช่าง/คิวซี</th>
-                                        <th colspan="3" style="width:48%;">เวลาทำงาน : ชั่วโมง</th>
-                                    </tr>
-                                    <tr><th style="width:16%;">เวลาเข้า</th><th style="width:16%;">เวลาออก</th><th style="width:16%;">รวมผลิตได้</th></tr>
-                                    <tr class="blank-row"><td>1</td><td></td><td></td><td></td><td></td></tr>
-                                    <tr class="blank-row"><td>2</td><td></td><td></td><td></td><td></td></tr>
-                                    <tr class="blank-row"><td>3</td><td></td><td></td><td></td><td></td></tr>
-                                </table>
-                            </div>
-                            <div class="employee-table-container">
-                                <table>
-                                    <tr><th colspan="5" style="padding: 3px;">รายละเอียดพนักงานประจำเครื่อง (กะดึก)</th></tr>
-                                    <tr>
-                                        <th rowspan="2" style="width:12%;">ลำดับ</th>
-                                        <th rowspan="2" style="width:40%;">ชื่อ-สกุล พนักงาน/ช่าง/คิวซี</th>
-                                        <th colspan="3" style="width:48%;">เวลาทำงาน : ชั่วโมง</th>
-                                    </tr>
-                                    <tr><th style="width:16%;">เวลาเข้า</th><th style="width:16%;">เวลาออก</th><th style="width:16%;">รวมผลิตได้</th></tr>
-                                    <tr class="blank-row"><td>1</td><td></td><td></td><td></td><td></td></tr>
-                                    <tr class="blank-row"><td>2</td><td></td><td></td><td></td><td></td></tr>
-                                    <tr class="blank-row"><td>3</td><td></td><td></td><td></td><td></td></tr>
-                                </table>
-                            </div>
-                        </div>
+                        // เปลี่ยนโครงสร้างตารางพนักงานเป็นแบบนี้ในลูปการแสดงผล
+<div class="employee-section-row">
+    <div class="employee-table-container">
+        <table class="text-center">
+            <tr><th colspan="5" style="padding: 5px; font-size: 13px;">รายละเอียดพนักงานประจำเครื่อง (กะเช้า)</th></tr>
+            <tr>
+                <th style="width:10%;">ลำดับ</th>
+                <th style="width:40%;">ชื่อ-สกุล พนักงาน/ช่าง/คิวซี</th>
+                <th style="width:15%;">เวลาเข้า</th>
+                <th style="width:15%;">เวลาออก</th>
+                <th style="width:20%;">รวมผลิตได้</th>
+            </tr>
+            <tr><td>1</td><td></td><td></td><td></td><td></td></tr>
+            <tr><td>2</td><td></td><td></td><td></td><td></td></tr>
+            <tr><td>3</td><td></td><td></td><td></td><td></td></tr>
+            <tr><td>4</td><td></td><td></td><td></td><td></td></tr>
+            <tr><td>5</td><td></td><td></td><td></td><td></td></tr>
+        </table>
+    </div>
+    
+    <div class="employee-table-container">
+        <table class="text-center">
+            <tr><th colspan="5" style="padding: 5px; font-size: 13px;">รายละเอียดพนักงานประจำเครื่อง (กะดึก)</th></tr>
+            <tr>
+                <th style="width:10%;">ลำดับ</th>
+                <th style="width:40%;">ชื่อ-สกุล พนักงาน/ช่าง/คิวซี</th>
+                <th style="width:15%;">เวลาเข้า</th>
+                <th style="width:15%;">เวลาออก</th>
+                <th style="width:20%;">รวมผลิตได้</th>
+            </tr>
+            <tr><td>1</td><td></td><td></td><td></td><td></td></tr>
+            <tr><td>2</td><td></td><td></td><td></td><td></td></tr>
+            <tr><td>3</td><td></td><td></td><td></td><td></td></tr>
+            <tr><td>4</td><td></td><td></td><td></td><td></td></tr>
+            <tr><td>5</td><td></td><td></td><td></td><td></td></tr>
+        </table>
+    </div>
+</div>
                         
                         <div class="doc-ctrl-bottom">ประกาศใช้เมื่อวันที่ : 9 มิถุนายน 2569</div>
                         <div class="btn-print-row text-end mt-2">
