@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบใบรายงานการสั่งงานผลิต ขวด PET</title>
+    <style>
+        :root {
+            --primary-color: #1e3a8a;
+            --primary-hover: #1d4ed8;
+            --secondary-color: #0f172a;
+            --background: #f8fafc;
+            --card-bg: #ffffff;
+            --border: #cbd5e1;
+            --text: #334155;
+            --success: #10b981;
+            --danger: #ef4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--background);
+            color: var(--text);
+            padding: 20px;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 3px solid var(--primary-color);
+            padding-bottom: 15px;
+        }
+
+        header h1 {
+            color: var(--primary-color);
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        header p {
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        .grid-header {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+            background: #f1f5f9;
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--secondary-color);
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 14px;
+            outline: none;
+            transition: border 0.2s;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            border-color: var(--primary-color);
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin-bottom: 15px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        th {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 12px;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 10px;
+            border-bottom: 1px solid var(--border);
+            background: #fff;
+        }
+
+        .table-form-input {
+            width: 100%;
+            padding: 6px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            min-width: 100px;
+        }
+
+        .btn {
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            margin-bottom: 25px;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn-success {
+            background-color: var(--success);
+            font-size: 16px;
+        }
+
+        .btn-success:hover {
+            background-color: #059669;
+        }
+
+        .btn-danger {
+            background-color: var(--danger);
+            padding: 6px 12px;
+            border-radius: 4px;
+        }
+
+        .btn-danger:hover {
+            background-color: #dc2626;
+        }
+
+        .section-title {
+            font-size: 18px;
+            color: var(--primary-color);
+            margin: 25px 0 15px 0;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .footer-action {
+            text-align: right;
+            margin-top: 30px;
+            border-top: 1px solid var(--border);
+            padding-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>ใบรายงานการสั่งงานผลิต ขวด PET</h1>
+            <p>ระบบบันทึกข้อมูลและส่งรายงานเข้า Google Sheets อัตโนมัติ</p>
+        </header>
+
+        <form id="productionForm">
+            <div class="grid-header">
+                <div class="form-group">
+                    <label>วัน/เดือน/ปี</label>
+                    <input type="date" id="docDate">
+                </div>
+                <div class="form-group">
+                    <label>เครื่องจักรที่</label>
+                    <input type="text" id="machineNo" placeholder="เช่น 4 CR-29">
+                </div>
+                <div class="form-group">
+                    <label>เลขที่เอกสาร</label>
+                    <input type="text" id="docNo" placeholder="เช่น 0021 (6)">
+                </div>
+                <div class="form-group">
+                    <label>ผู้สั่งงาน</label>
+                    <input type="text" id="orderedBy" placeholder="ชื่อผู้สั่งงาน">
+                </div>
+                <div class="form-group">
+                    <label>ผู้บันทึก</label>
+                    <input type="text" id="recordedBy" placeholder="ชื่อผู้บันทึก">
+                </div>
+            </div>
+
+            <div class="section-title"> รายละเอียดแผนผลิต (ระบุจำนวน)</div>
+            <div class="table-container">
+                <table id="planTable">
+                    <thead>
+                        <tr>
+                            <th>ชื่อลูกค้า/STOCK</th>
+                            <th>ผลิตภัณฑ์/ขนาด</th>
+                            <th>วัตถุดิบ/สี</th>
+                            <th>จำนวนสั่งผลิต (กล่อง)</th>
+                            <th>จำนวนสั่งผลิต (ใบ)</th>
+                            <th>เวลาวางแผน (เริ่ม)</th>
+                            <th>เวลาวางแผน (สิ้นสุด)</th>
+                            <th>รวมเวลา (ชม.)</th>
+                            <th>หมายเหตุ</th>
+                            <th style="width: 50px;">ลบ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="plan-row">
+                            <td><input type="text" class="table-form-input customer" placeholder="STOCK"></td>
+                            <td><input type="text" class="table-form-input productSize" placeholder="250 ซีซี เลขที่ 9"></td>
+                            <td><input type="text" class="table-form-input materialColor" placeholder="20g ใส ฝาสีขาว"></td>
+                            <td><input type="number" class="table-form-input qtyBox" placeholder="10"></td>
+                            <td><input type="number" class="table-form-input qtyPcs" placeholder="11,000"></td>
+                            <td><input type="time" class="table-form-input planStart" onchange="calculateRowHours(this)"></td>
+                            <td><input type="time" class="table-form-input planEnd" onchange="calculateRowHours(this)"></td>
+                            <td><input type="number" class="table-form-input totalHours" placeholder="4" readonly></td>
+                            <td><input type="text" class="table-form-input remark" placeholder="order 50g"></td>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <button type="button" class="btn btn-primary" onclick="addNewRow()">➕ รายละเอียดแผนผลิต (ระบุจำนวน)</button>
+
+            <div class="footer-action">
+                <button type="submit" class="btn btn-success">🚀 ส่งข้อมูลสั่งงานผลิต</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // ฟังก์ชันสำหรับเพิ่มแถวใหม่ในตารางรายละเอียดแผนผลิต
+        function addNewRow() {
+            const tableBody = document.getElementById('planTable').getElementsByTagName('tbody')[0];
+            const newRow = document.createElement('tr');
+            newRow.className = 'plan-row';
+            
+            newRow.innerHTML = `
+                <td><input type="text" class="table-form-input customer" placeholder="STOCK"></td>
+                <td><input type="text" class="table-form-input productSize" placeholder="ขนาดผลิตภัณฑ์"></td>
+                <td><input type="text" class="table-form-input materialColor" placeholder="สี/วัตถุดิบ"></td>
+                <td><input type="number" class="table-form-input qtyBox" placeholder="0"></td>
+                <td><input type="number" class="table-form-input qtyPcs" placeholder="0"></td>
+                <td><input type="time" class="table-form-input planStart" onchange="calculateRowHours(this)"></td>
+                <td><input type="time" class="table-form-input planEnd" onchange="calculateRowHours(this)"></td>
+                <td><input type="number" class="table-form-input totalHours" placeholder="0" readonly></td>
+                <td><input type="text" class="table-form-input remark" placeholder="หมายเหตุเพิ่มเติม"></td>
+                <td><button type="button" class="btn btn-danger" onclick="removeRow(this)">🗑️</button></td>
+            `;
+            
+            tableBody.appendChild(newRow);
+        }
+
+        // ฟังก์ชันลบแถวที่ไม่ต้องการออก
+        function removeRow(button) {
+            const row = button.parentNode.parentNode;
+            row.parentNode.removeChild(row);
+        }
+
+        // ฟังก์ชันคำนวณชั่วโมงแยกของแต่ละแถวอัตโนมัติ
+        function calculateRowHours(inputElement) {
+            const row = inputElement.parentNode.parentNode;
+            const start = row.querySelector('.planStart').value;
+            const end = row.querySelector('.planEnd').value;
+            const totalHoursInput = row.querySelector('.totalHours');
+            
+            if (start && end) {
+                const startTime = new Date(`1970-01-01T${start}:00`);
+                const endTime = new Date(`1970-01-01T${end}:00`);
+                
+                let diffMs = endTime - startTime;
+                if (diffMs < 0) { // กรณีข้ามวัน
+                    diffMs += 24 * 60 * 60 * 1000;
+                }
+                
+                const diffHrs = (diffMs / (1000 * 60 * 60)).toFixed(1);
+                totalHoursInput.value = diffHrs;
+            } else {
+                totalHoursInput.value = '';
+            }
+        }
+
+        // ฟังก์ชันจัดการส่งข้อมูลทั้งหมดเข้า Google Sheets
+        document.getElementById('productionForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbz_ZF323w5PacyXyIQv-omysXFaLTr-OGNjuEY0NdpAhuEr0itpvToSO8FAUSv_1Aen2g/exec"; 
+
+            // รวบรวมข้อมูลแผนผลิตทั้งหมดในทุกๆ แถวใส่เป็น Array
+            const planRows = document.querySelectorAll('.plan-row');
+            const plansData = [];
+            
+            planRows.forEach(row => {
+                plansData.push({
+                    customer: row.querySelector('.customer').value,
+                    productSize: row.querySelector('.productSize').value,
+                    materialColor: row.querySelector('.materialColor').value,
+                    qtyBox: row.querySelector('.qtyBox').value,
+                    qtyPcs: row.querySelector('.qtyPcs').value,
+                    planStart: row.querySelector('.planStart').value,
+                    planEnd: row.querySelector('.planEnd').value,
+                    totalHours: row.querySelector('.totalHours').value,
+                    remark: row.querySelector('.remark').value
+                });
+            });
+
+            // จับมัดรวมโครงสร้างข้อมูลที่จะนำส่ง (เอาพนักงานกะเช้า/กะดึกออกแล้ว)
+            const formData = {
+                docDate: document.getElementById('docDate').value,
+                machineNo: document.getElementById('machineNo').value,
+                docNo: document.getElementById('docNo').value,
+                orderedBy: document.getElementById('orderedBy').value,
+                recordedBy: document.getElementById('recordedBy').value,
+                plans: plansData // ส่งข้อมูลแผนการผลิตเป็นลิสต์แถว
+            };
+
+            fetch(WEB_APP_URL, {
+                method: "POST",
+                mode: "no-cors",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(() => {
+                alert("🎉 ส่งข้อมูลเข้า Google Sheet สำเร็จแล้ว!");
+                // รีเซ็ตฟอร์ม และลบแถวส่วนเกินเหลือไว้แค่แถวแรกแถวเดียว
+                document.getElementById('productionForm').reset();
+                const tableBody = document.getElementById('planTable').getElementsByTagName('tbody')[0];
+                tableBody.innerHTML = `
+                    <tr class="plan-row">
+                        <td><input type="text" class="table-form-input customer" placeholder="STOCK"></td>
+                        <td><input type="text" class="table-form-input productSize" placeholder="250 ซีซี เลขที่ 9"></td>
+                        <td><input type="text" class="table-form-input materialColor" placeholder="20g ใส ฝาสีขาว"></td>
+                        <td><input type="number" class="table-form-input qtyBox" placeholder="10"></td>
+                        <td><input type="number" class="table-form-input qtyPcs" placeholder="11,000"></td>
+                        <td><input type="time" class="table-form-input planStart" onchange="calculateRowHours(this)"></td>
+                        <td><input type="time" class="table-form-input planEnd" onchange="calculateRowHours(this)"></td>
+                        <td><input type="number" class="table-form-input totalHours" placeholder="4" readonly></td>
+                        <td><input type="text" class="table-form-input remark" placeholder="order 50g"></td>
+                        <td></td>
+                    </tr>
+                `;
+            })
+            .catch(error => {
+                alert("❌ เกิดข้อผิดพลาด: " + error);
+                console.error(error);
+            });
+        });
+    </script>
+</body>
+</html>
